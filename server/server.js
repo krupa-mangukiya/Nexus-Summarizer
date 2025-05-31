@@ -31,3 +31,9 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+// Enable trust proxy for Render's reverse proxy
+app.set('trust proxy', true);
+
+// Add compression middleware
+const compression = require('compression');
+app.use(compression());
