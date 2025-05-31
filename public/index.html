@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Summarizer | AI-Powered Text Summarization</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1><span class="logo-icon">N</span>exus Summarizer</h1>
+                <button id="theme-toggle" class="theme-toggle" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <p class="tagline">Transform lengthy text into concise summaries with AI</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <div class="toolbar">
+                    <button id="clear-btn" class="tool-btn" title="Clear">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button id="paste-btn" class="tool-btn" title="Paste">
+                        <i class="fas fa-paste"></i>
+                    </button>
+                    <div class="file-upload">
+                        <label for="file-input" class="tool-btn" title="Upload File">
+                            <i class="fas fa-file-upload"></i>
+                            <input type="file" id="file-input" accept=".txt,.pdf,.docx">
+                        </label>
+                    </div>
+                </div>
+                <textarea id="input-text" placeholder="Enter or paste your text here..."></textarea>
+                <div class="char-count">
+                    <span id="input-count">0</span> characters
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="control-group">
+                    <label for="summary-style">Summary Style:</label>
+                    <select id="summary-style">
+                        <option value="academic">Academic</option>
+                        <option value="simple">Simple</option>
+                        <option value="bullet">Bullet Points</option>
+                        <option value="narrative">Narrative</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="summary-length">Summary Length:</label>
+                    <select id="summary-length">
+                        <option value="very-short">Very Short</option>
+                        <option value="short">Short</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="long">Long</option>
+                        <option value="detailed">Detailed</option>
+                    </select>
+                </div>
+                <button id="summarize-btn" class="primary-btn">
+                    <span id="summarize-text">Summarize</span>
+                    <span id="loading-spinner" class="loading-spinner hidden">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </div>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h3>Summary</h3>
+                    <div class="output-tools">
+                        <button id="copy-btn" class="tool-btn" title="Copy">
+                            <i class="far fa-copy"></i>
+                        </button>
+                        <button id="download-btn" class="tool-btn" title="Download">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="output-text" class="output-text"></div>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Original:</span>
+                        <span id="original-length" class="stat-value">0</span> chars
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Summary:</span>
+                        <span id="summary-length-stat" class="stat-value">0</span> chars
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Reduction:</span>
+                        <span id="reduction-percent" class="stat-value">0</span>%
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by Google Gemini AI</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
