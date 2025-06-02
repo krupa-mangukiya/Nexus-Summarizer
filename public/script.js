@@ -1,246 +1,159 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM Elements
-    const inputText = document.getElementById('input-text');
-    const outputText = document.getElementById('output-text');
-    const inputCount = document.getElementById('input-count');
-    const originalLength = document.getElementById('original-length');
-    const summaryLengthStat = document.getElementById('summary-length-stat');
-    const reductionPercent = document.getElementById('reduction-percent');
-    const summarizeBtn = document.getElementById('summarize-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const pasteBtn = document.getElementById('paste-btn');
-    const copyBtn = document.getElementById('copy-btn');
-    const downloadBtn = document.getElementById('download-btn');
-    const fileInput = document.getElementById('file-input');
-    const summaryStyle = document.getElementById('summary-style');
-    const summaryLength = document.getElementById('summary-length');
-    const toast = document.getElementById('toast');
+    // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
-    const loadingSpinner = document.getElementById('loading-spinner');
-    const summarizeText = document.getElementById('summarize-text');
-
-    // Theme Management
-    const currentTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    updateThemeIcon(currentTheme);
-
-    themeToggle.addEventListener('click', toggleTheme);
-
-    function toggleTheme() {
+    const moonIcon = themeToggle.querySelector('.fa-moon');
+    const sunIcon = themeToggle.querySelector('.fa-sun');
+    
+    // Check for saved theme preference or use preferred color scheme
+    const savedTheme = localStorage.getItem('theme') || 
+                      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    if (savedTheme === 'light') {
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+    }
+    
+    themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
-    }
-
-    function updateThemeIcon(theme) {
-        const icon = themeToggle.querySelector('i');
-        icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-    }
-
-    // Character count update
-    inputText.addEventListener('input', function() {
-        const count = this.value.length;
-        inputCount.textContent = count;
+        
+        moonIcon.classList.toggle('hidden');
+        sunIcon.classList.toggle('hidden');
     });
-
-    // Clear button
-    clearBtn.addEventListener('click', function() {
+    
+    // Character Counter
+    const inputText = document.getElementById('input-text');
+    const inputCount = document.getElementById('input-count');
+    
+    inputText.addEventListener('input', () => {
+        inputCount.textContent = inputText.value.length;
+    });
+    
+    // Toolbar Buttons
+    document.getElementById('clear-btn').addEventListener('click', () => {
         inputText.value = '';
-        outputText.textContent = '';
         inputCount.textContent = '0';
-        originalLength.textContent = '0';
-        summaryLengthStat.textContent = '0';
-        reductionPercent.textContent = '0';
-        showToast('Cleared all content');
     });
-
-    // Paste button
-    pasteBtn.addEventListener('click', function() {
-        navigator.clipboard.readText()
-            .then(text => {
-                inputText.value = text;
-                inputCount.textContent = text.length;
-                showToast('Pasted from clipboard');
-            })
-            .catch(err => {
-                showToast('Failed to read clipboard', 'error');
-                console.error('Failed to read clipboard:', err);
-            });
-    });
-
-    // Copy button
-    copyBtn.addEventListener('click', function() {
-        if (outputText.textContent.trim()) {
-            navigator.clipboard.writeText(outputText.textContent)
-                .then(() => showToast('Summary copied to clipboard'))
-                .catch(err => {
-                    showToast('Failed to copy', 'error');
-                    console.error('Failed to copy:', err);
-                });
-        } else {
-            showToast('No summary to copy', 'warning');
+    
+    document.getElementById('paste-btn').addEventListener('click', async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            inputText.value = text;
+            inputCount.textContent = text.length;
+            showToast('Text pasted from clipboard');
+        } catch (err) {
+            showToast('Failed to paste from clipboard', 'error');
         }
     });
-
-    // Download button
-    downloadBtn.addEventListener('click', function() {
-        if (outputText.textContent.trim()) {
-            const blob = new Blob([outputText.textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'summary.txt';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showToast('Summary downloaded');
-        } else {
-            showToast('No summary to download', 'warning');
-        }
-    });
-
-    // File upload
-    fileInput.addEventListener('change', function(e) {
+    
+    // File Upload
+    document.getElementById('file-input').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-
-        const fileType = file.type;
-        const validTypes = ['text/plain', 'application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-
-        if (!validTypes.includes(fileType)) {
-            showToast('Invalid file type. Please upload a TXT, PDF, or DOCX file.', 'error');
-            return;
-        }
-
-        if (fileType === 'text/plain') {
-            readTextFile(file);
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            inputText.value = event.target.result;
+            inputCount.textContent = inputText.value.length;
+            showToast(`File "${file.name}" loaded`);
+        };
+        
+        if (file.type === 'application/pdf') {
+            // PDF handling would require a library like pdf.js
+            showToast('PDF processing not implemented', 'warning');
         } else {
-            // For PDF and DOCX, we'll send to the server for processing
-            uploadFile(file);
+            reader.readAsText(file);
         }
     });
-
-    function readTextFile(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            inputText.value = e.target.result;
-            inputCount.textContent = e.target.result.length;
-            showToast('Text file loaded');
-        };
-        reader.readAsText(file);
-    }
-
-    function uploadFile(file) {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        toggleLoading(true);
-
-        fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('File processing failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            inputText.value = data.text;
-            inputCount.textContent = data.text.length;
-            showToast(`${file.type.includes('pdf') ? 'PDF' : 'DOCX'} file processed`);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Failed to process file', 'error');
-        })
-        .finally(() => {
-            toggleLoading(false);
-        });
-    }
-
-    // Summarize button
-    summarizeBtn.addEventListener('click', function() {
+    
+    // Copy Button
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        const outputText = document.getElementById('output-text').textContent;
+        if (!outputText.trim()) {
+            showToast('No summary to copy', 'warning');
+            return;
+        }
+        
+        navigator.clipboard.writeText(outputText)
+            .then(() => showToast('Summary copied to clipboard'))
+            .catch(() => showToast('Failed to copy', 'error'));
+    });
+    
+    // Download Button
+    document.getElementById('download-btn').addEventListener('click', () => {
+        const outputText = document.getElementById('output-text').textContent;
+        if (!outputText.trim()) {
+            showToast('No summary to download', 'warning');
+            return;
+        }
+        
+        const blob = new Blob([outputText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'summary.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Summary downloaded');
+    });
+    
+    // Summarize Button (Mock Functionality)
+    document.getElementById('summarize-btn').addEventListener('click', () => {
         const text = inputText.value.trim();
         if (!text) {
             showToast('Please enter some text to summarize', 'warning');
             return;
         }
-
-        const style = summaryStyle.value;
-        const length = summaryLength.value;
-
-        summarizeText.textContent = 'Summarizing...';
-        toggleLoading(true);
-
-        fetch('/api/summarize', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                text: text,
-                style: style,
-                length: length
-            })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Summarization failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            outputText.textContent = data.summary;
-            updateStats(text.length, data.summary.length);
-            showToast('Summary generated successfully');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Failed to generate summary', 'error');
-            outputText.textContent = 'An error occurred while generating the summary. Please try again.';
-        })
-        .finally(() => {
-            summarizeText.textContent = 'Summarize';
-            toggleLoading(false);
-        });
-    });
-
-    function updateStats(originalLengthValue, summaryLengthValue) {
-        originalLength.textContent = originalLengthValue;
-        summaryLengthStat.textContent = summaryLengthValue;
         
-        const reduction = Math.round(((originalLengthValue - summaryLengthValue) / originalLengthValue) * 100);
-        reductionPercent.textContent = reduction;
-    }
-
-    function toggleLoading(isLoading) {
-        if (isLoading) {
-            loadingSpinner.classList.remove('hidden');
-            summarizeBtn.disabled = true;
-        } else {
-            loadingSpinner.classList.add('hidden');
-            summarizeBtn.disabled = false;
-        }
-    }
-
+        const style = document.getElementById('summary-style').value;
+        const length = document.getElementById('summary-length').value;
+        
+        // Show loading state
+        const spinner = document.getElementById('loading-spinner');
+        const buttonText = document.getElementById('summarize-text');
+        spinner.classList.remove('hidden');
+        buttonText.textContent = 'Summarizing...';
+        
+        // Mock API call (in a real app, this would be a fetch to your backend)
+        setTimeout(() => {
+            const mockSummary = generateMockSummary(text, style, length);
+            document.getElementById('output-text').textContent = mockSummary;
+            
+            // Update stats
+            const originalLength = text.length;
+            const summaryLength = mockSummary.length;
+            const reduction = Math.round((1 - (summaryLength / originalLength)) * 100);
+            
+            document.getElementById('original-length').textContent = originalLength;
+            document.getElementById('summary-length-stat').textContent = summaryLength;
+            document.getElementById('reduction-percent').textContent = reduction;
+            
+            // Reset button
+            spinner.classList.add('hidden');
+            buttonText.textContent = 'Summarize';
+            
+            showToast('Summary generated');
+        }, 1500);
+    });
+    
+    // Set current year in footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    
+    // Toast Notification Function
     function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
         toast.textContent = message;
         toast.className = 'toast';
         
-        switch (type) {
-            case 'error':
-                toast.style.backgroundColor = 'var(--error-color)';
-                break;
-            case 'warning':
-                toast.style.backgroundColor = 'var(--warning-color)';
-                break;
-            default:
-                toast.style.backgroundColor = 'var(--success-color)';
+        // Add type class if provided
+        if (type) {
+            toast.classList.add(type);
         }
         
         toast.classList.add('show');
@@ -248,5 +161,38 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
+    }
+    
+    // Mock Summary Generator (for demo purposes)
+    function generateMockSummary(text, style, length) {
+        const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+        let summaryLength;
+        
+        switch (length) {
+            case 'very-short': summaryLength = Math.max(1, Math.floor(sentences.length * 0.1)); break;
+            case 'short': summaryLength = Math.max(1, Math.floor(sentences.length * 0.25)); break;
+            case 'medium': summaryLength = Math.max(1, Math.floor(sentences.length * 0.4)); break;
+            case 'long': summaryLength = Math.max(1, Math.floor(sentences.length * 0.6)); break;
+            case 'detailed': summaryLength = Math.max(1, Math.floor(sentences.length * 0.8)); break;
+            default: summaryLength = Math.max(1, Math.floor(sentences.length * 0.4));
+        }
+        
+        let summary = sentences.slice(0, summaryLength).join(' ');
+        
+        switch (style) {
+            case 'bullet':
+                summary = sentences.slice(0, summaryLength)
+                    .map(s => `• ${s.trim()}`)
+                    .join('\n');
+                break;
+            case 'academic':
+                summary = `This text discusses several key points:\n\n${sentences.slice(0, summaryLength).join(' ')}\n\nIn conclusion, the main ideas are clearly presented.`;
+                break;
+            case 'narrative':
+                summary = `The content begins by explaining that ${sentences[0].toLowerCase()} ${sentences.slice(1, summaryLength).join(' ')}`;
+                break;
+        }
+        
+        return summary;
     }
 });

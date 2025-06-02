@@ -4,23 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus Summarizer | AI-Powered Text Summarization</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-top">
-                <h1><span class="logo-icon">N</span>exus Summarizer</h1>
-                <button id="theme-toggle" class="theme-toggle" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon"></i>
-                </button>
+    <header class="glass-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 10 L90 50 L50 90 L10 50 Z" fill="url(#gradient)"/>
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#8a2be2"/>
+                                    <stop offset="100%" stop-color="#6a1b9a"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        <span>N</span>
+                    </div>
+                    <h1>Nexus Summarizer</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="social-links">
+                        <a href="https://www.linkedin.com/in/krupa-m-32aab8290" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://github.com/krupa-mangukiya" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun hidden"></i>
+                    </button>
+                </div>
             </div>
-            <p class="tagline">Transform lengthy text into concise summaries with AI</p>
-        </header>
+        </div>
+    </header>
 
-        <div class="main-content">
+    <main class="container">
+        <section class="hero">
+            <div class="hero-content">
+                <h2>AI-Powered Text Summarization</h2>
+                <p class="subtitle">Transform lengthy articles, documents, and texts into concise, meaningful summaries with cutting-edge AI technology.</p>
+            </div>
+        </section>
+
+        <div class="app-container glass-panel">
             <div class="input-section">
                 <div class="toolbar">
                     <button id="clear-btn" class="tool-btn" title="Clear">
@@ -35,16 +68,16 @@
                             <input type="file" id="file-input" accept=".txt,.pdf,.docx">
                         </label>
                     </div>
+                    <div class="char-count">
+                        <span id="input-count">0</span> characters
+                    </div>
                 </div>
                 <textarea id="input-text" placeholder="Enter or paste your text here..."></textarea>
-                <div class="char-count">
-                    <span id="input-count">0</span> characters
-                </div>
             </div>
 
             <div class="controls-section">
                 <div class="control-group">
-                    <label for="summary-style">Summary Style:</label>
+                    <label for="summary-style">Summary Style</label>
                     <select id="summary-style">
                         <option value="academic">Academic</option>
                         <option value="simple">Simple</option>
@@ -53,7 +86,7 @@
                     </select>
                 </div>
                 <div class="control-group">
-                    <label for="summary-length">Summary Length:</label>
+                    <label for="summary-length">Summary Length</label>
                     <select id="summary-length">
                         <option value="very-short">Very Short</option>
                         <option value="short">Short</option>
@@ -85,25 +118,53 @@
                 <div id="output-text" class="output-text"></div>
                 <div class="stats">
                     <div class="stat-item">
-                        <span class="stat-label">Original:</span>
-                        <span id="original-length" class="stat-value">0</span> chars
+                        <span class="stat-value" id="original-length">0</span>
+                        <span class="stat-label">Original chars</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Summary:</span>
-                        <span id="summary-length-stat" class="stat-value">0</span> chars
+                        <span class="stat-value" id="summary-length-stat">0</span>
+                        <span class="stat-label">Summary chars</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Reduction:</span>
-                        <span id="reduction-percent" class="stat-value">0</span>%
+                        <span class="stat-value" id="reduction-percent">0</span>
+                        <span class="stat-label">Reduction</span>
                     </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <footer>
-            <p>Powered by Google Gemini AI</p>
-        </footer>
-    </div>
+    <footer class="glass-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo-icon small">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 10 L90 50 L50 90 L10 50 Z" fill="url(#gradient)"/>
+                        </svg>
+                    </div>
+                    <div class="footer-info">
+                        <h3>Nexus Summarizer</h3>
+                        <p>AI-Powered Text Summarization</p>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-social">
+                        <a href="https://www.linkedin.com/in/krupa-m-32aab8290" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://github.com/krupa-mangukiya" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                    <div class="footer-meta">
+                        <p>Powered by Google Gemini AI</p>
+                        <p class="copyright">&copy; <span id="current-year"></span> Nexus Summarizer. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <div id="toast" class="toast"></div>
 
